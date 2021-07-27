@@ -37,7 +37,15 @@ void AGun::PullTrigger()
 	FHitResult HitResult;
 	bool bSuccess = GetWorld()->LineTraceSingleByChannel(HitResult, ControllerLocation, End, ECollisionChannel::ECC_GameTraceChannel1);
 	if (bSuccess) {
-		DrawDebugPoint(GetWorld(), HitResult.Location, 20.0f, FColor::Red, true);
+		// DrawDebugPoint(GetWorld(), HitResult.Location, 20.0f, FColor::Red, true);
+		FVector InShotDirection = -ControllerRotation.Vector();
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, HitResult.Location, InShotDirection.Rotation());
+		// cause damage
+		AActor* ActorOnHit = HitResult.GetActor();
+		if (ActorOnHit) {
+			FPointDamageEvent DamageEvent(Damage, HitResult, InShotDirection, nullptr);
+			ActorOnHit->TakeDamage(Damage, DamageEvent, OwnerController, OwnerPawn);
+		}
 	}
 }
 
