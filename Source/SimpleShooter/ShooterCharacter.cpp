@@ -57,6 +57,10 @@ float AShooterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 	return Damage;
 }
 
+bool AShooterCharacter::IsDead() const {
+	return Health <= 0.0f;
+}
+
 void AShooterCharacter::MoveForward(float AxisValue)
 {
 	AddMovementInput(GetActorForwardVector() * AxisValue);
