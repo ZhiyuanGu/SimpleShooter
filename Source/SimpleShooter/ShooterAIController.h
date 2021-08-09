@@ -9,6 +9,7 @@
 /**
  *
  */
+class UBehavior;
 UCLASS()
 class SIMPLESHOOTER_API AShooterAIController : public AAIController
 {
@@ -21,7 +22,8 @@ public:
 	virtual void Tick(float DeltaSeconds)override;
 
 private:
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-		float AcceptanceRadius = 200.0f;
-
+	/*UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+		float AcceptanceRadius = 200.0f;*/
+	UPROPERTY(EditAnywhere)
+		UBehaviorTree* AIBehavior;
 };
