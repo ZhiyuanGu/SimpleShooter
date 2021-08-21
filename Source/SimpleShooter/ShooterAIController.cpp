@@ -20,16 +20,19 @@ void AShooterAIController::BeginPlay() {
 void AShooterAIController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	//if (PlayerPawn) {
-	//	if (LineOfSightTo(PlayerPawn)) {
-	//		SetFocus(PlayerPawn); // GamePlay priority
-	//		MoveToActor(PlayerPawn, AcceptanceRadius); // Movement priority, follow till in 2 meters range
-	//	}
-	//	else {
-	//		ClearFocus(EAIFocusPriority::Gameplay);
-	//		StopMovement();
-	//	}
-	//}
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+	if (PlayerPawn) {
+		if (LineOfSightTo(PlayerPawn)) {
+			// set PlayerLocation
+			GetBlackboardComponent()->SetValueAsVector(TEXT("PlayerLocation"), PlayerPawn->GetActorLocation());
+			// set LastKnownPlayerLocation
+			GetBlackboardComponent()->SetValueAsVector(TEXT("LastKnownPlayerLocation"), PlayerPawn->GetActorLocation());
+		}
+		else {
+			// clear PlayerLocation
+			GetBlackboardComponent()->ClearValue(TEXT("PlayerLocation"));
+		}
+	}
 
 
 }
