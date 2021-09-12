@@ -33,6 +33,10 @@ public:
 	UFUNCTION(BlueprintPure)// no execution pin in blueprint
 		bool IsDead() const;
 
+	UFUNCTION(BlueprintPure)// no execution pin in blueprint
+		float GetHealthPercentage() const;
+
+
 	void Shoot();
 
 private:

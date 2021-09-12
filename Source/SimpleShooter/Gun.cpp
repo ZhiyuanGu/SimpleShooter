@@ -21,33 +21,18 @@ void AGun::PullTrigger()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Trigger pulled"));
 	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlashSocket"));
-
-	APawn* OwnerPawn = Cast<APawn>(GetOwner());
-	if (!OwnerPawn) {
-		return;
-	}
-	AController* OwnerController = OwnerPawn->GetController();
-	if (!OwnerController) {
-		return;
-	}
-	FVector ControllerLocation;
-	FRotator ControllerRotation;
-	OwnerController->GetPlayerViewPoint(ControllerLocation, ControllerRotation);
-	FVector End = ControllerLocation + ControllerRotation.Vector() * MaxRange;
+	UGameplayStatics::SpawnSoundAttached(MuzzleSound, Mesh, TEXT("MuzzleFlashSocket"));
 	FHitResult HitResult;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-	Params.AddIgnoredActor(GetOwner());
-	bool bSuccess = GetWorld()->LineTraceSingleByChannel(HitResult, ControllerLocation, End, ECollisionChannel::ECC_GameTraceChannel1, Params);
+	FVector InShotDirection;
+	bool bSuccess = GunTrace(HitResult, InShotDirection);
 	if (bSuccess) {
-		// DrawDebugPoint(GetWorld(), HitResult.Location, 20.0f, FColor::Red, true);
-		FVector InShotDirection = -ControllerRotation.Vector();
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, HitResult.Location, InShotDirection.Rotation());
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, HitResult.Location);
 		// cause damage
 		AActor* ActorOnHit = HitResult.GetActor();
 		if (ActorOnHit) {
 			FPointDamageEvent DamageEvent(Damage, HitResult, InShotDirection, nullptr);
-			ActorOnHit->TakeDamage(Damage, DamageEvent, OwnerController, OwnerPawn);
+			ActorOnHit->TakeDamage(Damage, DamageEvent, GetOwnerController(), this);
 		}
 	}
 }
@@ -63,6 +48,33 @@ void AGun::BeginPlay()
 void AGun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+}
+
+bool AGun::GunTrace(FHitResult& HitResult, FVector& InShotDirection)
+{
+	AController* OwnerController = GetOwnerController();
+	if (!OwnerController) {
+		return false;
+	}
+	FVector ControllerLocation;
+	FRotator ControllerRotation;
+	OwnerController->GetPlayerViewPoint(ControllerLocation, ControllerRotation);
+	InShotDirection = -ControllerRotation.Vector();
+	FVector End = ControllerLocation + ControllerRotation.Vector() * MaxRange;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(GetOwner());
+	return GetWorld()->LineTraceSingleByChannel(HitResult, ControllerLocation, End, ECollisionChannel::ECC_GameTraceChannel1, Params);
+}
+
+AController* AGun::GetOwnerController() const
+{
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	if (!OwnerPawn) {
+		return nullptr;
+	}
+	return OwnerPawn->GetController();
 
 }
 
