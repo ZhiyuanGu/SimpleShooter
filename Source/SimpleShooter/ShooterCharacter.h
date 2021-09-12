@@ -33,6 +33,8 @@ public:
 	UFUNCTION(BlueprintPure)// no execution pin in blueprint
 		bool IsDead() const;
 
+	void Shoot();
+
 private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
@@ -41,7 +43,6 @@ private:
 	void LookUpRate(float AxisValue);
 	void LookRightRate(float AxisValue);
 
-	void Shoot();
 
 	UPROPERTY(EditAnywhere)
 		float RotationRate = 100.0f;
